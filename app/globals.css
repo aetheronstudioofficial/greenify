@@ -45,3 +45,13 @@ html, body {
     animation: float-slow 7s ease-in-out infinite;
   }
 }
+
+/* Hide scrollbar for clean horizontal list navigation */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
