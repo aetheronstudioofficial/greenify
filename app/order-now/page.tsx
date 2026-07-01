@@ -380,10 +380,10 @@ export default function OrderNow() {
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id)}
-                    className={`w-full flex items-center gap-3 py-3 rounded-r-xl text-sm font-semibold transition-all duration-200 group text-left border-l-3 ${
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group text-left ${
                       isActive
-                        ? "border-[#415e47] text-[#1b3b24] font-extrabold bg-[#415e47]/5 pl-4"
-                        : "border-transparent text-[#415e47]/70 hover:bg-[#415e47]/5 hover:text-[#1b3b24] pl-4"
+                        ? "text-[#1b3b24] font-extrabold bg-[#415e47]/5"
+                        : "text-[#415e47]/70 hover:bg-[#415e47]/5 hover:text-[#1b3b24]"
                     }`}
                   >
                     <span className={`transition-transform duration-200 ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
