@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Types
 interface Category {
@@ -11,10 +11,7 @@ interface Category {
   icon: (className: string) => React.ReactNode;
 }
 
-export default function OrderNow() {
-  const [activeCategory, setActiveCategory] = useState<string>("all");
-
-  const categories: Category[] = [
+const categories: Category[] = [
     {
       id: "all",
       name: "All Categories",
@@ -228,6 +225,59 @@ export default function OrderNow() {
     },
   ];
 
+export default function OrderNow() {
+  const [activeCategory, setActiveCategory] = useState<string>("all");
+
+  // Scrollspy: Sync active category based on page scroll intersection
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: "-120px 0px -70% 0px", // focus area just below the sticky header
+      threshold: 0,
+    };
+
+    const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id.replace("category-section-", "");
+          setActiveCategory(id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(handleIntersection, observerOptions);
+
+    categories.forEach((cat) => {
+      const el = document.getElementById(`category-section-${cat.id}`);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Center/Scroll active menu buttons into view automatically when selection changes
+  useEffect(() => {
+    // Scroll active mobile header button
+    const activeMobileBtn = document.getElementById(`mobile-category-btn-${activeCategory}`);
+    if (activeMobileBtn) {
+      activeMobileBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    }
+
+    // Scroll active desktop sidebar button
+    const activeDesktopBtn = document.getElementById(`desktop-category-btn-${activeCategory}`);
+    if (activeDesktopBtn) {
+      activeDesktopBtn.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+    }
+  }, [activeCategory]);
+
+  const scrollToCategory = (id: string) => {
+    setActiveCategory(id);
+    const element = document.getElementById(`category-section-${id}`);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
   return (
     <div className="min-h-screen w-full bg-[#faf7f2] text-[#0d1c12] selection:bg-[#fade1a] selection:text-[#1b3b24] relative flex flex-col justify-between">
       <header className="w-full sticky top-0 z-50 shrink-0 pt-[env(safe-area-inset-top)] bg-[#415e47]">
@@ -288,7 +338,8 @@ export default function OrderNow() {
                 return (
                   <button
                     key={cat.id}
-                    onClick={() => setActiveCategory(cat.id)}
+                    id={`mobile-category-btn-${cat.id}`}
+                    onClick={() => scrollToCategory(cat.id)}
                     className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-300 active:scale-95 ${
                       isActive
                         ? "bg-[#fade1a] text-[#1b3b24] shadow-md shadow-black/10 scale-105"
@@ -379,7 +430,8 @@ export default function OrderNow() {
                 return (
                   <button
                     key={cat.id}
-                    onClick={() => setActiveCategory(cat.id)}
+                    id={`desktop-category-btn-${cat.id}`}
+                    onClick={() => scrollToCategory(cat.id)}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group text-left ${
                       isActive
                         ? "text-[#1b3b24] font-extrabold bg-[#415e47]/5"
@@ -413,24 +465,29 @@ export default function OrderNow() {
           </div>
         </aside>
 
-        {/* Main Content Area showing selected category details (flat layout) */}
-        <div className="flex-grow flex flex-col gap-6 py-2">
-          <div className="w-full min-h-[400px] flex flex-col items-start justify-start pt-4 text-left">
-            
-            {/* Simple icon + title heading */}
-            <div className="flex items-center gap-4 mb-6 text-[#1b3b24]">
-              <div className="w-12 h-12 flex items-center justify-center bg-[#415e47]/10 rounded-xl text-[#415e47]">
-                {categories.find((c) => c.id === activeCategory)?.icon("w-6 h-6")}
+        {/* Main Content Area showing all categories stacked (flat layout) */}
+        <div className="flex-grow flex flex-col gap-16 py-2 pb-[40vh]">
+          {categories.map((cat) => (
+            <section
+              key={cat.id}
+              id={`category-section-${cat.id}`}
+              className="w-full min-h-[250px] flex flex-col items-start justify-start pt-4 text-left scroll-mt-28"
+            >
+              {/* Simple icon + title heading */}
+              <div className="flex items-center gap-4 mb-6 text-[#1b3b24]">
+                <div className="w-12 h-12 flex items-center justify-center bg-[#415e47]/10 rounded-xl text-[#415e47]">
+                  {cat.icon("w-6 h-6")}
+                </div>
+                <h2 className="font-title text-3xl sm:text-4xl font-extrabold tracking-tight capitalize">
+                  {cat.name}
+                </h2>
               </div>
-              <h1 className="font-title text-3xl sm:text-4xl font-extrabold tracking-tight capitalize">
-                {categories.find((c) => c.id === activeCategory)?.name}
-              </h1>
-            </div>
-            
-            <p className="text-[#415e47]/80 text-base leading-relaxed max-w-2xl font-medium">
-              We are preparing to stock fresh, organic, and hand-picked items for the <span className="font-bold text-[#415e47]">{categories.find((c) => c.id === activeCategory)?.name}</span> category. Check back soon for our full delivery selection!
-            </p>
-          </div>
+              
+              <p className="text-[#415e47]/80 text-base leading-relaxed max-w-2xl font-medium">
+                We are preparing to stock fresh, organic, and hand-picked items for the <span className="font-bold text-[#415e47]">{cat.name}</span> category. Check back soon for our full delivery selection!
+              </p>
+            </section>
+          ))}
         </div>
 
       </main>
