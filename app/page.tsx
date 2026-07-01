@@ -11,7 +11,7 @@ export default function Home() {
           <div className="flex items-center gap-3 group cursor-pointer">
             <div className="relative transition-transform duration-300 group-hover:scale-105 group-hover:rotate-6 w-10 h-10">
               <Image
-                src="/logo.png"
+                src="/logo.webp"
                 alt="Greenify Logo"
                 fill
                 className="object-contain"
@@ -48,13 +48,13 @@ export default function Home() {
               {/* Avatar stack */}
               <div className="flex -space-x-4">
                 <div className="w-10 h-10 rounded-full border-2 border-[#4c6d53] overflow-hidden hover:scale-110 hover:z-10 transition duration-200 relative">
-                  <Image src="/customer1.png" alt="Customer avatar" fill className="object-cover" />
+                  <Image src="/customer1.webp" alt="Customer avatar" fill className="object-cover" />
                 </div>
                 <div className="w-10 h-10 rounded-full border-2 border-[#4c6d53] overflow-hidden hover:scale-110 hover:z-10 transition duration-200 relative">
-                  <Image src="/customer2.png" alt="Customer avatar" fill className="object-cover" />
+                  <Image src="/customer2.webp" alt="Customer avatar" fill className="object-cover" />
                 </div>
                 <div className="w-10 h-10 rounded-full border-2 border-[#4c6d53] overflow-hidden hover:scale-110 hover:z-10 transition duration-200 relative">
-                  <Image src="/customer3.png" alt="Customer avatar" fill className="object-cover" />
+                  <Image src="/customer3.webp" alt="Customer avatar" fill className="object-cover" />
                 </div>
               </div>
               
@@ -146,7 +146,7 @@ export default function Home() {
               {/* Circle Image (Grocery Bag in hand) */}
               <div className="absolute left-[5%] top-[14%] w-[200px] md:w-[220px] lg:w-[200px] xl:w-[240px] h-[200px] md:h-[220px] lg:h-[200px] xl:h-[240px] rounded-full overflow-hidden border-[5px] border-white/12 shadow-2xl custom-float-slow z-20 hover:scale-105 transition-transform duration-500">
                 <Image
-                  src="/grocery_bag.png"
+                  src="/grocery_bag.webp"
                   alt="Organic grocery bag"
                   fill
                   className="object-cover"
@@ -158,7 +158,7 @@ export default function Home() {
               {/* Top Right Image (Mixed Veggies Flatlay) */}
               <div className="absolute right-[5%] top-[2%] w-[150px] md:w-[170px] lg:w-[150px] xl:w-[190px] h-[150px] md:h-[170px] lg:h-[150px] xl:h-[190px] rounded-custom-3xl overflow-hidden border-[5px] border-white/12 shadow-xl z-10 hover:scale-105 transition-transform duration-500">
                 <Image
-                  src="/mixed_veggies.png"
+                  src="/mixed_veggies.webp"
                   alt="Fresh organic vegetables"
                   fill
                   className="object-cover"
@@ -169,7 +169,7 @@ export default function Home() {
               {/* Bottom Left Image (Hand Carrots) */}
               <div className="absolute left-[12%] bottom-[2%] w-[160px] md:w-[180px] lg:w-[160px] xl:w-[200px] h-[160px] md:h-[180px] lg:h-[160px] xl:h-[200px] rounded-custom-3xl overflow-hidden border-[5px] border-white/12 shadow-xl z-20 hover:scale-105 transition-transform duration-500">
                 <Image
-                  src="/hand_carrots.png"
+                  src="/hand_carrots.webp"
                   alt="Fresh carrots"
                   fill
                   className="object-cover"
@@ -180,7 +180,7 @@ export default function Home() {
               {/* Bottom Right Image (Stacked Veggies) */}
               <div className="absolute right-[0%] bottom-[2%] w-[160px] md:w-[180px] lg:w-[160px] xl:w-[200px] h-[270px] md:h-[300px] lg:h-[270px] xl:h-[330px] rounded-[3rem] overflow-hidden border-[5px] border-white/12 shadow-2xl z-10 hover:scale-105 transition-transform duration-500">
                 <Image
-                  src="/stacked_veggies.png"
+                  src="/stacked_veggies.webp"
                   alt="Stacked healthy food"
                   fill
                   className="object-cover"
@@ -192,16 +192,16 @@ export default function Home() {
             {/* Mobile Fallback Layout */}
             <div className="sm:hidden w-full grid grid-cols-2 gap-4">
               <div className="relative aspect-square rounded-full overflow-hidden border-4 border-white/10 shadow-lg">
-                <Image src="/grocery_bag.png" alt="Organic grocery bag" fill className="object-cover" />
+                <Image src="/grocery_bag.webp" alt="Organic grocery bag" fill className="object-cover" />
               </div>
               <div className="relative aspect-square rounded-3xl overflow-hidden border-4 border-white/10 shadow-lg">
-                <Image src="/mixed_veggies.png" alt="Fresh vegetables" fill className="object-cover" />
+                <Image src="/mixed_veggies.webp" alt="Fresh vegetables" fill className="object-cover" />
               </div>
               <div className="relative aspect-square rounded-3xl overflow-hidden border-4 border-white/10 shadow-lg">
-                <Image src="/hand_carrots.png" alt="Fresh carrots" fill className="object-cover" />
+                <Image src="/hand_carrots.webp" alt="Fresh carrots" fill className="object-cover" />
               </div>
               <div className="relative aspect-2/3 rounded-3xl overflow-hidden border-4 border-white/10 shadow-lg">
-                <Image src="/stacked_veggies.png" alt="Stacked green veggies" fill className="object-cover" />
+                <Image src="/stacked_veggies.webp" alt="Stacked green veggies" fill className="object-cover" />
               </div>
             </div>
 
