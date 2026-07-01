@@ -1,11 +1,11 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
     <div className="min-h-screen w-full bg-linear-to-br from-[#415e47] via-[#527759] to-[#5b8262] text-white overflow-x-hidden selection:bg-[#fade1a] selection:text-[#1b3b24] relative flex flex-col">
       
-      {/* Header / Navigation */}
-      <header className="w-full border-b border-white/10 bg-white/5 backdrop-blur-md sticky top-0 z-50 shrink-0 pt-[env(safe-area-inset-top)]">
+      <header className="w-full sticky top-0 z-50 shrink-0 pt-[env(safe-area-inset-top)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-3 group cursor-pointer">
@@ -39,9 +39,9 @@ export default function Home() {
             </h1>
 
             {/* Order Now Button with Accessibility Focus State */}
-            <button className="bg-[#fade1a] text-[#1b3b24] hover:bg-white hover:text-[#44644c] font-extrabold px-9 py-4 rounded-xl shadow-lg shadow-black/10 hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 self-start text-sm uppercase tracking-widest focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#527759]">
+            <Link href="/order-now" className="bg-[#fade1a] text-[#1b3b24] hover:bg-white hover:text-[#44644c] font-extrabold px-9 py-4 rounded-xl shadow-lg shadow-black/10 hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-300 self-start text-sm uppercase tracking-widest text-center focus:outline-hidden focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#527759]">
               Order Now
-            </button>
+            </Link>
 
             {/* Reviews Section */}
             <div className="flex items-center gap-4 mt-2">

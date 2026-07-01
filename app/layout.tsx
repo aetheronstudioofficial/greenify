@@ -43,7 +43,30 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${plusJakarta.variable} h-full antialiased bg-[#faf7f2] text-[#0d1c12]`}
     >
-      <body className="min-h-full flex flex-col bg-[#faf7f2] text-[#0d1c12]">{children}</body>
+      <body className="min-h-full flex flex-col bg-[#faf7f2] text-[#0d1c12]">
+        {children}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Disable gesture zoom (Safari)
+              document.addEventListener('gesturestart', function (e) {
+                e.preventDefault();
+              });
+              // Disable multi-touch zoom (Safari/Chrome/Firefox on iOS/Android)
+              document.addEventListener('touchstart', function (e) {
+                if (e.touches.length > 1) {
+                  e.preventDefault();
+                }
+              }, { passive: false });
+              document.addEventListener('touchmove', function (e) {
+                if (e.touches.length > 1) {
+                  e.preventDefault();
+                }
+              }, { passive: false });
+            `,
+          }}
+        />
+      </body>
     </html>
   );
 }
