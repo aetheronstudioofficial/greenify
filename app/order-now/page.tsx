@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 // Types
 interface Category {
@@ -227,16 +227,19 @@ const categories: Category[] = [
 
 export default function OrderNow() {
   const [activeCategory, setActiveCategory] = useState<string>("all");
+  const isProgrammaticScroll = useRef<boolean>(false);
 
   // Scrollspy: Sync active category based on page scroll intersection
   useEffect(() => {
     const observerOptions = {
       root: null,
-      rootMargin: "-120px 0px -70% 0px", // focus area just below the sticky header
+      rootMargin: "-180px 0px -60% 0px", // focus area just below sticky header
       threshold: 0,
     };
 
     const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+      if (isProgrammaticScroll.current) return;
+
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const id = entry.target.id.replace("category-section-", "");
@@ -271,11 +274,16 @@ export default function OrderNow() {
   }, [activeCategory]);
 
   const scrollToCategory = (id: string) => {
+    isProgrammaticScroll.current = true;
     setActiveCategory(id);
     const element = document.getElementById(`category-section-${id}`);
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+    // Re-enable scrollspy observer after smooth scrolling finishes
+    setTimeout(() => {
+      isProgrammaticScroll.current = false;
+    }, 1000);
   };
 
   return (
@@ -471,7 +479,7 @@ export default function OrderNow() {
             <section
               key={cat.id}
               id={`category-section-${cat.id}`}
-              className="w-full min-h-[250px] flex flex-col items-start justify-start pt-4 text-left scroll-mt-28"
+              className="w-full min-h-[250px] flex flex-col items-start justify-start pt-4 text-left scroll-mt-48 md:scroll-mt-28"
             >
               {/* Simple icon + title heading */}
               <div className="flex items-center gap-4 mb-6 text-[#1b3b24]">
