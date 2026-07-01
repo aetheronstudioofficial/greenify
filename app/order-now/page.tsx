@@ -2,232 +2,41 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import Footer from "@/components/Footer";
 
-// Types
-interface Category {
-  id: string;
-  name: string;
-  icon: (className: string) => React.ReactNode;
-}
+import { categories } from "./categories";
 
-const categories: Category[] = [
-    {
-      id: "all",
-      name: "All Categories",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <rect x="3" y="3" width="7" height="7" rx="1.5" />
-          <rect x="14" y="3" width="7" height="7" rx="1.5" />
-          <rect x="14" y="14" width="7" height="7" rx="1.5" />
-          <rect x="3" y="14" width="7" height="7" rx="1.5" />
-        </svg>
-      ),
-    },
-    {
-      id: "fruits",
-      name: "Fruits",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <path d="M12 22c4.97 0 9-3.03 9-7 0-3.31-2.69-6-6-6-.54 0-1.04.09-1.5.26-.77.29-1.5.26-2.25-.09A5.62 5.62 0 0 0 9 9c-3.31 0-6 2.69-6 6 0 3.97 4.03 7 9 7Z" />
-          <path d="M12 9c0-2.5 1.5-4.5 3.5-5" />
-          <path d="M14 4.5c.5-1 2.5-.5 2.5-.5s0 2-1 2.5" />
-        </svg>
-      ),
-    },
-    {
-      id: "vegetables",
-      name: "Vegetables",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <path d="M15.3 3.3c.4-.4 1-.4 1.4 0l4 4c.4.4.4 1 0 1.4L9.4 20c-.5.5-1.2.8-2 .8H4v-3.4c0-.8.3-1.5.8-2L15.3 3.3z" />
-          <path d="M14 7l3 3" />
-          <path d="M18.5 2.5c0 0 .5 2-1 3.5s-3.5 1-3.5 1" />
-        </svg>
-      ),
-    },
-    {
-      id: "dairy",
-      name: "Dairy & Eggs",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <path d="M6 18h12" />
-          <path d="M8 22h8" />
-          <path d="M9 2h6v4H9z" />
-          <path d="M7 6h10v12a3 3 0 0 1-3 3H10a3 3 0 0 1-3-3V6z" />
-          <circle cx="12" cy="13" r="2" />
-        </svg>
-      ),
-    },
-    {
-      id: "bakery",
-      name: "Bakery",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <path d="M3 14c0-3.3 2.7-6 6-6 1 0 1.9.2 2.8.7C12.7 6.9 14.2 6 16 6c3.3 0 6 2.7 6 6v3H3v-1z" />
-          <path d="M3 15h19v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4z" />
-          <path d="M7 11v3" />
-          <path d="M12 10v4" />
-          <path d="M17 11v3" />
-        </svg>
-      ),
-    },
-    {
-      id: "beverages",
-      name: "Beverages",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
-          <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z" />
-          <line x1="6" y1="2" x2="6" y2="4" />
-          <line x1="10" y1="2" x2="10" y2="4" />
-          <line x1="14" y1="2" x2="14" y2="4" />
-        </svg>
-      ),
-    },
-    {
-      id: "beauty",
-      name: "Beauty & Care",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <path d="M9 11h6v10a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2V11z" />
-          <path d="M12 6v5" />
-          <path d="M12 6a3 3 0 0 1 3-3h1" />
-          <path d="M12 6a3 3 0 0 0-3-3H8" />
-        </svg>
-      ),
-    },
-    {
-      id: "snacks",
-      name: "Snacks & Sweets",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <circle cx="12" cy="12" r="9" />
-          <path d="M8 12h.01" strokeWidth="3" />
-          <path d="M12 8h.01" strokeWidth="3" />
-          <path d="M16 12h.01" strokeWidth="3" />
-          <path d="M12 16h.01" strokeWidth="3" />
-          <path d="M12 12h.01" strokeWidth="3" />
-          <path d="M7 16h.01" strokeWidth="3" />
-          <path d="M17 16h.01" strokeWidth="3" />
-          <path d="M17 8h.01" strokeWidth="3" />
-          <path d="M7 8h.01" strokeWidth="3" />
-        </svg>
-      ),
-    },
-    {
-      id: "meat",
-      name: "Meat & Seafood",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <path d="m15 4 5 5v3a8 8 0 0 1-8 8H7a3 3 0 0 1-3-3v-5a8 8 0 0 1 8-8h3Z" />
-          <path d="M9.5 14.5c.5.5.5 1.5 0 2s-1.5.5-2 0" />
-          <path d="M19 19a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-        </svg>
-      ),
-    },
-    {
-      id: "pantry",
-      name: "Pantry & Staples",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <path d="M5 6h14M5 10h14M5 14h14M5 18h14" />
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-        </svg>
-      ),
-    },
-    {
-      id: "frozen",
-      name: "Frozen Foods",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <line x1="12" y1="2" x2="12" y2="22" />
-          <line x1="2" y1="12" x2="22" y2="12" />
-          <path d="m20 16-4-4 4-4M4 8l4 4-4 4M16 4l-4 4-4-4M8 20l4-4 4 4" />
-        </svg>
-      ),
-    },
-    {
-      id: "household",
-      name: "Household & Cleaning",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <path d="M12 2v4M8 6h8M6 10h12v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V10z" />
-          <path d="M10 14h4M10 18h4" />
-        </svg>
-      ),
-    },
-    {
-      id: "baby",
-      name: "Baby Care",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <path d="M9 12h6v9a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-9z" />
-          <path d="M10 7a2 2 0 0 1 4 0v5H10V7z" />
-          <path d="M12 2v5" />
-          <path d="M10 16h4" />
-        </svg>
-      ),
-    },
-    {
-      id: "pets",
-      name: "Pet Supplies",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <path d="M17.5 7.5a2.5 2.5 0 1 1-5 0c0-.8.4-1.5 1-2L7 12c-.5-.6-1.2-1-2-1a2.5 2.5 0 1 0 0 5c.8 0 1.5-.4 2-1l6.5 6.5c.6-.5 1.3-.9 2.1-.9a2.5 2.5 0 1 1-1.1-4.9Z" />
-        </svg>
-      ),
-    },
-    {
-      id: "organic",
-      name: "Organic & Health",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          <path d="M12 8a3 3 0 0 1 3 3c0 3-3 6-3 6s-3-3-3-6a3 3 0 0 1 3-3z" />
-        </svg>
-      ),
-    },
-    {
-      id: "pharmacy",
-      name: "Pharmacy & Wellness",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(45 12 12)" />
-          <line x1="9" y1="15" x2="15" y2="9" />
-        </svg>
-      ),
-    },
-    {
-      id: "kitchen",
-      name: "Kitchen & Home",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <circle cx="12" cy="12" r="10" />
-          <path d="M8 8v8M6 8h4" />
-          <path d="M16 8v8M14 8h4" />
-        </svg>
-      ),
-    },
-    {
-      id: "gifts",
-      name: "Gifts & Flowers",
-      icon: (className) => (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <rect x="4" y="9" width="16" height="12" rx="2" />
-          <rect x="3" y="5" width="18" height="4" rx="1" />
-          <line x1="12" y1="5" x2="12" y2="21" />
-          <line x1="4" y1="13" x2="20" y2="13" />
-          <path d="M12 5a3 3 0 0 0-3-3c-1.5 0-3 1.5-3 3h6Z" />
-          <path d="M12 5a3 3 0 0 1 3-3c1.5 0 3 1.5 3 3h-6Z" />
-        </svg>
-      ),
-    },
-  ];
-
-export default function OrderNow() {
+function OrderNowContent() {
   const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [isDesktopBasketOpen, setIsDesktopBasketOpen] = useState<boolean>(false);
   const isProgrammaticScroll = useRef<boolean>(false);
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams ? searchParams.get("category") : null;
+
+  const scrollToCategory = (id: string) => {
+    isProgrammaticScroll.current = true;
+    setActiveCategory(id);
+    const element = document.getElementById(`category-section-${id}`);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    // Re-enable scrollspy observer after smooth scrolling finishes
+    setTimeout(() => {
+      isProgrammaticScroll.current = false;
+    }, 1000);
+  };
+
+  // Scroll to category if passed in URL query parameters
+  useEffect(() => {
+    if (categoryParam) {
+      const timer = setTimeout(() => {
+        scrollToCategory(categoryParam);
+      }, 400); // Allow layout elements to mount
+      return () => clearTimeout(timer);
+    }
+  }, [categoryParam]);
 
   // Scrollspy: Sync active category based on page scroll intersection
   useEffect(() => {
@@ -273,19 +82,6 @@ export default function OrderNow() {
     }
   }, [activeCategory]);
 
-  const scrollToCategory = (id: string) => {
-    isProgrammaticScroll.current = true;
-    setActiveCategory(id);
-    const element = document.getElementById(`category-section-${id}`);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-    // Re-enable scrollspy observer after smooth scrolling finishes
-    setTimeout(() => {
-      isProgrammaticScroll.current = false;
-    }, 1000);
-  };
-
   return (
     <div className="min-h-screen w-full bg-[#faf7f2] text-[#0d1c12] selection:bg-[#fade1a] selection:text-[#1b3b24] relative flex flex-col justify-between">
       <header className="w-full sticky top-0 z-50 shrink-0 pt-[env(safe-area-inset-top)] bg-[#415e47]">
@@ -325,22 +121,20 @@ export default function OrderNow() {
             </div>
 
             {/* Row 2: Search Bar */}
-            <div className="relative w-full group">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-white/50 group-focus-within:text-[#1b3b24]/50 transition-colors duration-300">
+            <Link href="/search" className="relative w-full group block cursor-pointer">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-white/50 transition-colors duration-300">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8"/>
                   <path d="m21 21-4.3-4.3"/>
                 </svg>
               </span>
-              <input
-                type="text"
-                placeholder="Search fresh groceries..."
-                className="w-full bg-white/10 hover:bg-white/15 focus:bg-white focus:text-[#1b3b24] focus:placeholder-gray-400 placeholder-white/60 text-white text-sm rounded-xl py-2.5 pl-10 pr-4 outline-none transition duration-300 border border-white/5 focus:border-white/20 shadow-inner focus:shadow-md"
-              />
-            </div>
+              <div className="w-full bg-white/10 hover:bg-white/15 text-white/60 text-sm rounded-xl py-2.5 pl-10 pr-4 transition duration-300 border border-white/5 shadow-inner text-left select-none">
+                Search fresh groceries...
+              </div>
+            </Link>
 
             {/* Row 3: Mobile Category Selector */}
-            <div className="flex overflow-x-auto gap-2 pb-3 pt-0.5 px-0.5 -mx-4 px-4 no-scrollbar scroll-smooth">
+            <div className="flex overflow-x-auto gap-2 pb-3 pt-0.5 -mx-4 px-4 no-scrollbar scroll-smooth">
               {categories.map((cat) => {
                 const isActive = activeCategory === cat.id;
                 return (
@@ -374,6 +168,7 @@ export default function OrderNow() {
                     alt="Greenify Logo"
                     fill
                     className="object-contain"
+                    sizes="40px"
                     priority
                   />
                 </div>
@@ -413,14 +208,36 @@ export default function OrderNow() {
               </div>
             </div>
 
-            {/* Profile Icon */}
-            <div className="relative group shrink-0 cursor-pointer">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 group-hover:bg-white/20 group-hover:scale-105 group-hover:shadow-lg transition duration-300 shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-white">
-                  <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
+            {/* Profile & Basket Icons */}
+            <div className="flex items-center gap-4 shrink-0">
+              {/* Profile Icon */}
+              <div className="relative group cursor-pointer">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 group-hover:bg-white/20 group-hover:scale-105 group-hover:shadow-lg transition duration-300 shadow-md">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                </div>
               </div>
+
+              {/* Basket Icon (Desktop) */}
+              <button
+                onClick={() => setIsDesktopBasketOpen(true)}
+                className="relative group cursor-pointer outline-none"
+                aria-label="Open Basket"
+              >
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 group-hover:bg-white/20 group-hover:scale-105 group-hover:shadow-lg transition duration-300 shadow-md relative animate-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                    <path d="M3 6h18" />
+                    <path d="M16 10a4 4 0 0 1-8 0" />
+                  </svg>
+                  {/* Badge */}
+                  <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#fade1a] text-[10px] font-extrabold text-[#1b3b24] shadow-md border-2 border-[#415e47]">
+                    0
+                  </span>
+                </div>
+              </button>
             </div>
           </div>
         </div>
@@ -474,26 +291,19 @@ export default function OrderNow() {
         </aside>
 
         {/* Main Content Area showing all categories stacked (flat layout) */}
-        <div className="flex-grow flex flex-col gap-16 py-2 pb-[40vh]">
+        <div className="grow flex flex-col gap-16 py-2 pb-[40vh]">
           {categories.map((cat) => (
             <section
               key={cat.id}
               id={`category-section-${cat.id}`}
-              className="w-full min-h-[250px] flex flex-col items-start justify-start pt-4 text-left scroll-mt-48 md:scroll-mt-28"
+              className="w-full min-h-[150px] flex flex-col items-start justify-start pt-4 text-left scroll-mt-48 md:scroll-mt-28 border-b border-dashed border-[#415e47]/20 pb-8 last:border-b-0"
             >
-              {/* Simple icon + title heading */}
-              <div className="flex items-center gap-4 mb-6 text-[#1b3b24]">
-                <div className="w-12 h-12 flex items-center justify-center bg-[#415e47]/10 rounded-xl text-[#415e47]">
-                  {cat.icon("w-6 h-6")}
-                </div>
+              {/* Simple title heading */}
+              <div className="flex items-center text-[#1b3b24] mb-4">
                 <h2 className="font-title text-3xl sm:text-4xl font-extrabold tracking-tight capitalize">
                   {cat.name}
                 </h2>
               </div>
-              
-              <p className="text-[#415e47]/80 text-base leading-relaxed max-w-2xl font-medium">
-                We are preparing to stock fresh, organic, and hand-picked items for the <span className="font-bold text-[#415e47]">{cat.name}</span> category. Check back soon for our full delivery selection!
-              </p>
             </section>
           ))}
         </div>
@@ -501,9 +311,71 @@ export default function OrderNow() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full border-t border-[#415e47]/10 bg-[#faf7f2] py-6 text-[#415e47]/60 text-xs text-center">
-        <p>&copy; {new Date().getFullYear()} Greenify. All rights reserved.</p>
-      </footer>
+      <div className="hidden md:block">
+        <Footer theme="light" />
+      </div>
+
+      {/* Desktop Basket Sidebar Drawer */}
+      {isDesktopBasketOpen && (
+        <div className="fixed inset-0 z-100 hidden md:flex justify-end animate-fade-in">
+          {/* Backdrop */}
+          <div
+            onClick={() => setIsDesktopBasketOpen(false)}
+            className="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity duration-300"
+          />
+          {/* Drawer Panel */}
+          <div className="relative w-96 h-full bg-[#faf7f2] shadow-2xl p-6 flex flex-col gap-6 animate-slide-in-right z-10 border-l border-[#415e47]/10">
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-gray-200/50 pb-4">
+              <h3 className="font-title text-2xl font-extrabold text-[#1b3b24]">My Basket</h3>
+              <button
+                onClick={() => setIsDesktopBasketOpen(false)}
+                className="w-9 h-9 flex items-center justify-center rounded-full bg-white text-[#415e47] hover:scale-105 active:scale-95 transition-all duration-200 shadow-sm border border-gray-100"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            {/* Content */}
+            <div className="grow flex flex-col items-center justify-center text-center p-4 gap-6">
+              <div className="w-20 h-20 flex items-center justify-center rounded-3xl bg-[#fade1a]/15 text-[#1b3b24] shadow-inner">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10">
+                  <circle cx="8" cy="21" r="1" />
+                  <circle cx="19" cy="21" r="1" />
+                  <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+                </svg>
+              </div>
+              <div className="flex flex-col gap-2">
+                <h4 className="font-bold text-xl text-[#1b3b24]">Your Basket is Empty</h4>
+                <p className="text-sm text-[#415e47]/75 leading-relaxed">
+                  Looks like you haven&apos;t added any items to your basket yet. Explore our categories of fresh, organic groceries to start shopping!
+                </p>
+              </div>
+              <button
+                onClick={() => setIsDesktopBasketOpen(false)}
+                className="w-full py-3 bg-[#415e47] text-white font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-[#344d39] transition duration-200 text-center shadow-md active:scale-98"
+              >
+                Continue Shopping
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+export default function OrderNow() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen w-full bg-[#faf7f2] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#415e47]"></div>
+      </div>
+    }>
+      <OrderNowContent />
+    </Suspense>
+  );
+}
+
