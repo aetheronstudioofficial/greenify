@@ -264,8 +264,8 @@ export default function OrderNow() {
         
         {/* Desktop Sidebar: hidden on mobile */}
         <aside className="hidden md:block w-64 shrink-0">
-          <div className="sticky top-28 bg-[#faf7f2] border border-[#415e47]/10 rounded-custom-3xl p-6 shadow-xs flex flex-col gap-4">
-            <h2 className="text-xs font-bold text-[#415e47]/50 uppercase tracking-widest px-2">
+          <div className="sticky top-28 flex flex-col gap-4 py-2">
+            <h2 className="text-xs font-bold text-[#415e47]/50 uppercase tracking-widest px-4">
               Categories
             </h2>
             <nav className="flex flex-col gap-1.5">
@@ -275,10 +275,10 @@ export default function OrderNow() {
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group text-left ${
+                    className={`w-full flex items-center gap-3 py-3 rounded-r-xl text-sm font-semibold transition-all duration-200 group text-left border-l-3 ${
                       isActive
-                        ? "bg-[#415e47] text-white shadow-md shadow-[#415e47]/10"
-                        : "text-[#415e47]/80 hover:bg-[#415e47]/5 hover:text-[#1b3b24]"
+                        ? "border-[#415e47] text-[#1b3b24] font-extrabold bg-[#415e47]/5 pl-4"
+                        : "border-transparent text-[#415e47]/70 hover:bg-[#415e47]/5 hover:text-[#1b3b24] pl-4"
                     }`}
                   >
                     <span className={`transition-transform duration-200 ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
@@ -308,23 +308,21 @@ export default function OrderNow() {
           </div>
         </aside>
 
-        {/* Main Content Area showing selected category details */}
-        <div className="flex-grow flex flex-col gap-6">
-          <div className="w-full p-8 md:p-12 rounded-custom-3xl bg-white border border-[#415e47]/10 shadow-xl shadow-green-900/5 min-h-[400px] flex flex-col items-center justify-center text-center">
+        {/* Main Content Area showing selected category details (flat layout) */}
+        <div className="flex-grow flex flex-col gap-6 py-2">
+          <div className="w-full min-h-[400px] flex flex-col items-start justify-start pt-4 text-left">
             
-            {/* Pulsing Container for Category Icon */}
-            <div className="relative w-20 h-20 flex items-center justify-center bg-[#415e47]/10 rounded-full p-4 mb-6 text-[#415e47]">
-              <div className="absolute inset-0 bg-[#fade1a]/20 rounded-full animate-ping opacity-30"></div>
-              <div className="relative transition-transform duration-300 hover:scale-110">
-                {categories.find((c) => c.id === activeCategory)?.icon("w-10 h-10")}
+            {/* Simple icon + title heading */}
+            <div className="flex items-center gap-4 mb-6 text-[#1b3b24]">
+              <div className="w-12 h-12 flex items-center justify-center bg-[#415e47]/10 rounded-xl text-[#415e47]">
+                {categories.find((c) => c.id === activeCategory)?.icon("w-6 h-6")}
               </div>
+              <h1 className="font-title text-3xl sm:text-4xl font-extrabold tracking-tight capitalize">
+                {categories.find((c) => c.id === activeCategory)?.name}
+              </h1>
             </div>
             
-            <h1 className="font-title text-3xl font-extrabold tracking-tight text-[#1b3b24] mb-3 capitalize">
-              {categories.find((c) => c.id === activeCategory)?.name}
-            </h1>
-            
-            <p className="text-[#415e47]/80 text-sm leading-relaxed max-w-md font-medium">
+            <p className="text-[#415e47]/80 text-base leading-relaxed max-w-2xl font-medium">
               We are preparing to stock fresh, organic, and hand-picked items for the <span className="font-bold text-[#415e47]">{categories.find((c) => c.id === activeCategory)?.name}</span> category. Check back soon for our full delivery selection!
             </p>
           </div>
