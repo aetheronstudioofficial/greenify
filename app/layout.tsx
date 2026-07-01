@@ -15,8 +15,22 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Greenify",
-  description: "Nurturing a Sustainable Future",
+  title: "Greenify - Order Fresh Groceries & Healthy Food",
+  description: "Order fresh groceries online and enjoy a healthy life with local organic produce delivered straight to your door.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Greenify",
+  },
+};
+
+export const viewport = {
+  themeColor: "#415e47",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -27,9 +41,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${plusJakarta.variable} h-full antialiased`}
+      className={`${inter.variable} ${plusJakarta.variable} h-full antialiased bg-[#faf7f2] text-[#0d1c12]`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col bg-[#faf7f2] text-[#0d1c12]">{children}</body>
     </html>
   );
 }

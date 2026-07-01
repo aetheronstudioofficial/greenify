@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f9fbf8;
-  --foreground: #142217;
+  --background: #faf7f2;
+  --foreground: #0d1c12;
 }
 
 @theme inline {
@@ -10,10 +10,37 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-title: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+
+  /* Custom Greenify Radius Extensions used in layout */
+  --radius-custom-3xl: 2.5rem;
 }
 
-body {
+/* Base HTML & Body Styling */
+html, body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Accessibility Animations */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-14px); }
+  }
+  .custom-float {
+    animation: float 4.5s ease-in-out infinite;
+  }
+  .custom-float-slow {
+    animation: float-slow 7s ease-in-out infinite;
+  }
 }
