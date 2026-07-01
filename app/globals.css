@@ -55,3 +55,18 @@ html, body {
   scrollbar-width: none;  /* Firefox */
 }
 
+/* iOS Safe Area Padding helper for sticky bottom elements */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Desktop Drawer Slide-in Animation */
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.animate-slide-in-right {
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+

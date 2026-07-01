@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import MobileNav from "@/components/MobileNav";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -43,11 +44,32 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${plusJakarta.variable} h-full antialiased bg-[#faf7f2] text-[#0d1c12]`}
     >
-      <body className="min-h-full flex flex-col bg-[#faf7f2] text-[#0d1c12]">
+      <body className="min-h-full flex flex-col bg-[#faf7f2] text-[#0d1c12] pb-16 md:pb-0">
         {children}
+        <MobileNav />
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              // Safeguard pointer capture to prevent Uncaught NotFoundError (e.g. unmounted elements)
+              if (typeof Element !== 'undefined') {
+                if (Element.prototype.releasePointerCapture) {
+                  const originalRelease = Element.prototype.releasePointerCapture;
+                  Element.prototype.releasePointerCapture = function (pointerId) {
+                    try {
+                      originalRelease.call(this, pointerId);
+                    } catch (e) {}
+                  };
+                }
+                if (Element.prototype.setPointerCapture) {
+                  const originalSet = Element.prototype.setPointerCapture;
+                  Element.prototype.setPointerCapture = function (pointerId) {
+                    try {
+                      originalSet.call(this, pointerId);
+                    } catch (e) {}
+                  };
+                }
+              }
+
               // Disable gesture zoom (Safari)
               document.addEventListener('gesturestart', function (e) {
                 e.preventDefault();
