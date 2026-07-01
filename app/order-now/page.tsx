@@ -265,9 +265,6 @@ export default function OrderNow() {
         {/* Desktop Sidebar: hidden on mobile */}
         <aside className="hidden md:block w-64 shrink-0">
           <div className="sticky top-28 flex flex-col gap-4 py-2">
-            <h2 className="text-xs font-bold text-[#415e47]/50 uppercase tracking-widest px-4">
-              Categories
-            </h2>
             <nav className="flex flex-col gap-1.5">
               {categories.map((cat) => {
                 const isActive = activeCategory === cat.id;
