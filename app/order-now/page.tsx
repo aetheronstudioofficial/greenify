@@ -7,13 +7,58 @@ import { useSearchParams } from "next/navigation";
 import Footer from "@/components/Footer";
 
 import { categories } from "./categories";
+import { products } from "./products";
+import ProductCard from "@/components/ProductCard";
 
 function OrderNowContent() {
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [isDesktopBasketOpen, setIsDesktopBasketOpen] = useState<boolean>(false);
+  const [cart, setCart] = useState<Record<string, number>>({});
+  const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const isProgrammaticScroll = useRef<boolean>(false);
   const searchParams = useSearchParams();
   const categoryParam = searchParams ? searchParams.get("category") : null;
+
+  useEffect(() => {
+    const savedCart = localStorage.getItem("greenify-cart");
+    const savedFavorites = localStorage.getItem("greenify-favorites");
+
+    setTimeout(() => {
+      if (savedCart) {
+        try {
+          setCart(JSON.parse(savedCart));
+        } catch {}
+      }
+      if (savedFavorites) {
+        try {
+          setFavorites(JSON.parse(savedFavorites));
+        } catch {}
+      }
+    }, 0);
+  }, []);
+
+  const updateCartQuantity = (productId: string, qty: number) => {
+    setCart((prev) => {
+      const updated = { ...prev };
+      if (qty <= 0) {
+        delete updated[productId];
+      } else {
+        updated[productId] = qty;
+      }
+      localStorage.setItem("greenify-cart", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const toggleFavorite = (productId: string) => {
+    setFavorites((prev) => {
+      const updated = { ...prev, [productId]: !prev[productId] };
+      localStorage.setItem("greenify-favorites", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const cartItemCount = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
 
   const scrollToCategory = (id: string) => {
     isProgrammaticScroll.current = true;
@@ -149,7 +194,7 @@ function OrderNowContent() {
                     }`}
                   >
                     {cat.icon("w-3.5 h-3.5 shrink-0")}
-                    <span>{cat.name}</span>
+                    {cat.id !== "all" && <span>{cat.name}</span>}
                   </button>
                 );
               })}
@@ -228,14 +273,16 @@ function OrderNowContent() {
               >
                 <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 group-hover:bg-white/20 group-hover:scale-105 group-hover:shadow-lg transition duration-300 shadow-md relative animate-none">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-white">
-                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-                    <path d="M3 6h18" />
-                    <path d="M16 10a4 4 0 0 1-8 0" />
+                    <circle cx="8" cy="21" r="1" />
+                    <circle cx="19" cy="21" r="1" />
+                    <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
                   </svg>
                   {/* Badge */}
-                  <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#fade1a] text-[10px] font-extrabold text-[#1b3b24] shadow-md border-2 border-[#415e47]">
-                    0
-                  </span>
+                  {cartItemCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#fade1a] text-[10px] font-extrabold text-[#1b3b24] shadow-md border-2 border-[#415e47]">
+                      {cartItemCount}
+                    </span>
+                  )}
                 </div>
               </button>
             </div>
@@ -266,7 +313,7 @@ function OrderNowContent() {
                     <span className={`transition-transform duration-200 ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
                       {cat.icon("w-4.5 h-4.5 shrink-0")}
                     </span>
-                    <span className="grow">{cat.name}</span>
+                    {cat.id !== "all" && <span className="grow">{cat.name}</span>}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="12"
@@ -299,10 +346,36 @@ function OrderNowContent() {
               className="w-full min-h-[150px] flex flex-col items-start justify-start pt-4 text-left scroll-mt-48 md:scroll-mt-28 border-b border-dashed border-[#415e47]/20 pb-8 last:border-b-0"
             >
               {/* Simple title heading */}
-              <div className="flex items-center text-[#1b3b24] mb-4">
-                <h2 className="font-title text-3xl sm:text-4xl font-extrabold tracking-tight capitalize">
-                  {cat.name}
-                </h2>
+              {cat.id !== "all" && (
+                <div className="flex items-center text-[#1b3b24] mb-4">
+                  <h2 className="font-title text-3xl sm:text-4xl font-extrabold tracking-tight capitalize">
+                    {cat.name}
+                  </h2>
+                </div>
+              )}
+
+              {/* Products Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 w-full mt-4">
+                {(cat.id === "all"
+                  ? products
+                  : products.filter((p) => p.category === cat.id)
+                ).map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    quantity={cart[product.id] || 0}
+                    onQuantityChange={(qty) => updateCartQuantity(product.id, qty)}
+                    isFavorite={!!favorites[product.id]}
+                    onFavoriteToggle={() => toggleFavorite(product.id)}
+                  />
+                ))}
+                {(cat.id === "all" ? products : products.filter((p) => p.category === cat.id)).length === 0 && (
+                  <div className="col-span-full py-8 text-center bg-white/40 border border-[#E7E3D8] rounded-2xl w-full">
+                    <p className="text-sm text-[#415e47]/60 italic font-semibold">
+                      Fresh items coming soon to the {cat.name} category!
+                    </p>
+                  </div>
+                )}
               </div>
             </section>
           ))}
@@ -339,27 +412,110 @@ function OrderNowContent() {
               </button>
             </div>
             {/* Content */}
-            <div className="grow flex flex-col items-center justify-center text-center p-4 gap-6">
-              <div className="w-20 h-20 flex items-center justify-center rounded-3xl bg-[#fade1a]/15 text-[#1b3b24] shadow-inner">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10">
-                  <circle cx="8" cy="21" r="1" />
-                  <circle cx="19" cy="21" r="1" />
-                  <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
-                </svg>
+            {cartItemCount === 0 ? (
+              <div className="grow flex flex-col items-center justify-center text-center p-4 gap-6">
+                <div className="w-20 h-20 flex items-center justify-center rounded-3xl bg-[#fade1a]/15 text-[#1b3b24] shadow-inner">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-10 h-10 text-[#1b3b24]">
+                    <circle cx="8" cy="21" r="1" />
+                    <circle cx="19" cy="21" r="1" />
+                    <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+                  </svg>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <h4 className="font-bold text-xl text-[#1b3b24]">Your Basket is Empty</h4>
+                  <p className="text-sm text-[#415e47]/75 leading-relaxed">
+                    Looks like you haven&apos;t added any items to your basket yet. Explore our categories of fresh, organic groceries to start shopping!
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsDesktopBasketOpen(false)}
+                  className="w-full py-3 bg-[#415e47] text-white font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-[#344d39] transition duration-200 text-center shadow-md active:scale-98"
+                >
+                  Continue Shopping
+                </button>
               </div>
-              <div className="flex flex-col gap-2">
-                <h4 className="font-bold text-xl text-[#1b3b24]">Your Basket is Empty</h4>
-                <p className="text-sm text-[#415e47]/75 leading-relaxed">
-                  Looks like you haven&apos;t added any items to your basket yet. Explore our categories of fresh, organic groceries to start shopping!
-                </p>
+            ) : (
+              <div className="grow flex flex-col justify-between h-full overflow-hidden">
+                {/* Scrollable list of cart items */}
+                <div className="grow overflow-y-auto pr-1 py-2 flex flex-col gap-3.5 no-scrollbar">
+                  {Object.entries(cart).map(([id, qty]) => {
+                    const product = products.find((p) => p.id === id);
+                    if (!product) return null;
+                    return (
+                      <div
+                        key={id}
+                        className="flex items-center gap-3.5 bg-white p-3 rounded-2xl border border-gray-150/50 shadow-xs hover:border-[#415e47]/20 transition-all duration-200"
+                      >
+                        <div className="relative w-12 h-12 bg-[#F8F3E9] rounded-xl overflow-hidden flex items-center justify-center shrink-0 border border-gray-100">
+                          <Image
+                            src={product.image}
+                            alt={product.name}
+                            fill
+                            className="object-contain p-1"
+                            sizes="48px"
+                          />
+                        </div>
+                        <div className="grow text-left">
+                          <h4 className="font-bold text-xs text-[#1b3b24] line-clamp-1">{product.name}</h4>
+                          <span className="text-[10px] text-[#2E7D32] bg-[#DDF5D8] font-bold px-1.5 py-0.5 rounded-sm inline-block mt-0.5 select-none">
+                            {product.priceTag}
+                          </span>
+                          <div className="flex items-center gap-1.5 mt-1.5 text-[11px]">
+                            <span className="font-extrabold text-[#252525]">
+                              ${(product.sp * qty).toFixed(2)}
+                            </span>
+                            <span className="text-[9px] text-[#9E9E9E] line-through font-semibold">
+                              ${(product.mrp * qty).toFixed(2)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Interactive minus / count / plus control */}
+                        <div className="flex items-center bg-[#F8F3E9] border border-[#E7E3D8] rounded-xl p-0.5 shrink-0 gap-1.5 shadow-2xs">
+                          <button
+                            onClick={() => updateCartQuantity(id, qty - 1)}
+                            className="w-6 h-6 flex items-center justify-center text-[#2E7D32] hover:bg-white rounded-lg transition-colors duration-150 font-bold text-sm cursor-pointer"
+                          >
+                            -
+                          </button>
+                          <span className="text-xs font-extrabold text-[#252525] min-w-[12px] text-center select-none">
+                            {qty}
+                          </span>
+                          <button
+                            onClick={() => updateCartQuantity(id, qty + 1)}
+                            className="w-6 h-6 flex items-center justify-center text-[#2E7D32] hover:bg-white rounded-lg transition-colors duration-150 font-bold text-sm cursor-pointer"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Subtotal summary and checkout action button */}
+                <div className="border-t border-gray-250/30 pt-4 mt-auto flex flex-col gap-3">
+                  <div className="flex items-center justify-between px-1">
+                    <span className="text-xs font-bold text-[#415e47]/70 uppercase tracking-wider">Subtotal</span>
+                    <span className="text-xl font-black text-[#1b3b24]">
+                      $
+                      {Object.entries(cart)
+                        .reduce((sum, [id, qty]) => {
+                          const p = products.find((prod) => prod.id === id);
+                          return sum + (p ? p.sp * qty : 0);
+                        }, 0)
+                        .toFixed(2)}
+                    </span>
+                  </div>
+                  <Link
+                    href="/cart"
+                    className="w-full py-3.5 bg-[#415e47] text-white font-extrabold text-xs uppercase tracking-widest rounded-xl hover:bg-[#344d39] transition duration-200 text-center shadow-md active:scale-98"
+                  >
+                    View Cart & Checkout
+                  </Link>
+                </div>
               </div>
-              <button
-                onClick={() => setIsDesktopBasketOpen(false)}
-                className="w-full py-3 bg-[#415e47] text-white font-bold text-xs uppercase tracking-widest rounded-xl hover:bg-[#344d39] transition duration-200 text-center shadow-md active:scale-98"
-              >
-                Continue Shopping
-              </button>
-            </div>
+            )}
           </div>
         </div>
       )}

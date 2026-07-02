@@ -2,9 +2,37 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export default function MobileNav() {
   const pathname = usePathname();
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const updateCount = () => {
+      const savedCart = localStorage.getItem("greenify-cart");
+      if (savedCart) {
+        try {
+          const parsed = JSON.parse(savedCart) as Record<string, number>;
+          const count = Object.values(parsed).reduce<number>((sum, qty) => sum + (Number(qty) || 0), 0);
+          setCartCount(count);
+        } catch {
+          setCartCount(0);
+        }
+      } else {
+        setCartCount(0);
+      }
+    };
+
+    updateCount();
+
+    window.addEventListener("storage", updateCount);
+    const interval = setInterval(updateCount, 1000);
+    return () => {
+      window.removeEventListener("storage", updateCount);
+      clearInterval(interval);
+    };
+  }, []);
 
   const isHomeActive = pathname === "/order-now";
   const isCategoryActive = pathname === "/category";
@@ -116,14 +144,16 @@ export default function MobileNav() {
                 strokeLinejoin="round"
                 className="w-5 h-5"
               >
-                <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
-                <path d="M3 6h18" />
-                <path d="M16 10a4 4 0 0 1-8 0" />
+                <circle cx="8" cy="21" r="1" />
+                <circle cx="19" cy="21" r="1" />
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
               </svg>
               {/* Badge: Mock empty basket badge */}
-              <span className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#fade1a] text-[9px] font-extrabold text-[#1b3b24] shadow-xs">
-                0
-              </span>
+              {cartCount > 0 && (
+                <span className="absolute -top-1.5 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#fade1a] text-[9px] font-extrabold text-[#1b3b24] shadow-xs">
+                  {cartCount}
+                </span>
+              )}
             </div>
             <span className="text-[10px] tracking-wide">Cart</span>
           </Link>
